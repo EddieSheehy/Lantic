@@ -9,17 +9,16 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     const mapRef = useRef(null);
     
     useEffect(() => {
-        fetch(geoJson) // Assuming your GeoJSON file is named data.geojson and located in the public directory
+        fetch(geoJson) 
     .then((response) => response.json())
     .then((data) => {
-  
-      // Create the GeoJSON layer with the fetched data
       L.geoJSON(data).addTo(mapRef.current);
-      // Do something with the layer if needed
     });
         mapRef.current = L.map('map', {      
         center: [53.3498, -6.2603],
         zoom: 7,
+        maxZoom: 16, 
+        minZoom: 7, 
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -33,7 +32,12 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
             popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
         });
 
-  
+        const southWest = L.latLng(48, -12); // Replace with your desired southwest corner coordinates
+        const northEast = L.latLng(56, -2); // Replace with your desired northeast corner coordinates
+
+        // Set the maximum bounds for the map
+        mapRef.current.setMaxBounds(L.latLngBounds(southWest, northEast));
+
         if (onMapLoad) {
             onMapLoad(mapRef.current);
         }

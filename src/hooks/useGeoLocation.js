@@ -13,8 +13,10 @@ const useGeoLocation = (eircode) => {
 
     const fetchLocation = async () => {
       
-        const bingGeocodingUrl = `http://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(eircode)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`;
+        const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalcode=${encodeURIComponent(eircode)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`;
+        
         const response = await fetch(bingGeocodingUrl);
+
         const data = await response.json();
         if (data.resourceSets[0].resources.length > 0) {
           var resource = data.resourceSets[0].resources[0];

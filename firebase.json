@@ -5,18 +5,6 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "hosting": {
-      
-      "headers": [
-        {"source": "/service-worker.js", "headers": [{"key": "Cache-Control", "value": "no-cache"}]}
-      ]
-    }
+    ]
   }
 }

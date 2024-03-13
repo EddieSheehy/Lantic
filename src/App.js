@@ -44,7 +44,6 @@ const App = () => {
             });
 
               // Extracting address from Bing Maps response
-              //var address = resource.address.formattedAddress;
               var hMarker = L.marker(location, { icon: customIcon}).addTo(map);
               setHomeMarker(hMarker)
               // After adding the marker
@@ -105,7 +104,7 @@ const App = () => {
             
 
   async function geocodeEircode(GeoEir) {
-    const bingGeocodingUrl = `http://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`;
+    const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`;
     
     // Return the fetch promise chain
     return fetch(bingGeocodingUrl)
@@ -170,8 +169,8 @@ const App = () => {
       <h1>{locality}, {county}, Ireland</h1>
       <div class="details-info">
         <p><strong>Details</strong></p>
-        <p>Average Price of rent:</p>
-        <p>Average Price of property:</p>
+        <p>Average Price of rent: Data Scraped by grouping data from Daft</p>
+        <p>Average Price of property: Data Scraped by grouping data / querying data files from property price register</p>
       </div>
       <div class="details-actions">
         <div class="work-input-button">
@@ -182,7 +181,7 @@ const App = () => {
         <button className="flood-button" onClick={() => window.location.href = 'https://www.floodinfo.ie/map/floodmaps/'}>Flooding Information</button>
         </div>
         </div>
-        <button className="amenities-button">Click for Nearby Amenities</button>
+        <button className="amenities-button" onClick={() => alert("To Be Added.")}>Click for Nearby Amenities</button>
       
     </div>
   </div>  
