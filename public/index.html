@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your App Name</title>
-    <!-- The following line will include the React build files after your app is built -->
-    <link href="%PUBLIC_URL%/favicon.ico" rel="icon">
-    <!-- Insert any additional metadata here, like keywords, author, description, etc. -->
-
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <!-- Stylesheets can go here -->
-    <link href="%PUBLIC_URL%/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="%PUBLIC_URL%/styles.css">
+    <!-- Firebase App is always required and must be first -->
+    <script defer src="/__/firebase/10.8.1/firebase-app-compat.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script defer src="/__/firebase/10.8.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/10.8.1/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/10.8.1/firebase-firestore-compat.js"></script>
+    <!-- Other Firebase SDKs you want to add -->
+    <script defer src="/__/firebase/init.js"></script>
 </head>
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!-- This div is the mounting point for your React app -->
-
-    <!-- React build scripts will be injected here by the build process -->
-    <!-- These scripts are automatically added when you run `npm run build` -->
-    <script src="%PUBLIC_URL%/static/js/bundle.js"></script>
-    <script src="%PUBLIC_URL%/static/js/0.chunk.js"></script>
-    <script src="%PUBLIC_URL%/static/js/main.chunk.js"></script>
+    <!-- The scripts below will be injected by Create React App during the build process -->
+    <!-- Firebase SDK is also initialized here -->
 </body>
 </html>
