@@ -42,7 +42,7 @@ const App = () => {
     })
 
     try {
-      const response = await axios.post('https://your-server.com/api/messages', {
+      const response = await axios.post('https://us-central1-lantic-a8dc1.cloudfunctions.net/echoString', {
         message: 'Hello, world!'
       })
       console.log('Message sent successfully:', response.data)
