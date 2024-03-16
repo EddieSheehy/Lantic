@@ -8,6 +8,8 @@ import marker from './marker.png'
 import * as turf from '@turf/turf';
 import geoJson from './ireland-counties.geojson';
 import useGeoLocation from './hooks/useGeoLocation';
+import axios from 'axios';
+
 
 // Component for the Map
 
@@ -34,7 +36,7 @@ const App = () => {
   }
 
   // Function to handle eircode submit
-  const handleSubmitPress = () => {
+  const handleSubmitPress = async () => {
           
               const customIcon = L.icon({
                 iconUrl: marker, // Update this path to your marker image
@@ -43,6 +45,14 @@ const App = () => {
                 popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
             });
 
+              try {
+    const response = await axios.post('https://your-server.com/api/messages', {
+      message: 'Hello, world!',
+    });
+    console.log('Message sent successfully:', response.data);
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
               // Extracting address from Bing Maps response
               var hMarker = L.marker(location, { icon: customIcon}).addTo(map);
               setHomeMarker(hMarker)
@@ -83,7 +93,6 @@ const App = () => {
         if (turf.booleanPointInPolygon(point, polygons[i])) {
             isInside = true;
             setCounty(polygons[i].properties.name)
-            //console.log(polygons[i].properties.name)
             break; // Exit the loop if the point is found within a polygon
         }
     }

@@ -73,7 +73,7 @@ body, html {
     position: absolute;
     top: 10%;
     right: 10%; /* Align to the right to use only half of the screen */
-    width: 40%; /* Adjust width to use less than half of the screen for padding */
+    width: 30%; /* Adjust width to use less than half of the screen for padding */
     max-height: 80%; /* Adjust height to take up a portion of the screen */
     overflow-y: auto; /* Add scroll inside the panel if content overflows */
     background-color: #fff;
