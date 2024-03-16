@@ -9,6 +9,8 @@
     "@testing-library/user-event": "^13.5.0",
     "@turf/turf": "^6.5.0",
     "axios": "^1.6.8",
+    "fastify": "^4.26.2",
+    "fastify-cors": "^6.1.0",
     "firebase": "^10.9.0",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
