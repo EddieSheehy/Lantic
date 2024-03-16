@@ -44,7 +44,12 @@ const App = () => {
     try {
       const response = await axios.post('https://us-central1-lantic-a8dc1.cloudfunctions.net/echoString', {
         message: 'Hello, world!'
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
+
       console.log('Message sent successfully:', response.data)
     } catch (error) {
       console.error('Error sending message:', error)
