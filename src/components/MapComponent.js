@@ -24,8 +24,8 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
               fillColor: 'orange',
               weight: 0.5,
               opacity: 0,
-              color: 'black', // color of the borders
-              fillOpacity: 0.1 // adjust opacity here
+              color: 'black',
+              fillOpacity: 0.1
             }
           }
         }).addTo(mapRef.current)

@@ -9,15 +9,13 @@ import * as turf from '@turf/turf'
 import geoJson from './ireland-counties.geojson'
 import useGeoLocation from './hooks/useGeoLocation'
 
-// Component for the Map
-
 // Main App component
 const App = () => {
   const [eircode, setEircode] = useState('')
   const [locality, setlocality] = useState('')
   const [county, setCounty] = useState('')
   const [workEircode, setWorkEircode] = useState('')
-  const [map, setMap] = useState(null) // State to hold the map object
+  const [map, setMap] = useState(null)
   const [routing, setRouting] = useState(null)
   const [homeMarker, setHomeMarker] = useState(null)
   const { location } = useGeoLocation(eircode)
@@ -33,10 +31,47 @@ const App = () => {
     setlocality(event.target.value)
   }
 
-  const fetchPropertyInfo = async () => {
+  const countyToLocationMapping = {
+    'Kerry County': 'Location.KERRY',
+    'Cork County': 'Location.CORK',
+    'Cork City': 'Location.CORKCITY',
+    'Limerick County': 'Location.LIMERICK',
+    'Limerick City': 'Location.LIMERICKCITY',
+    'Clare County': 'Location.CLARE',
+    'Waterford County': 'Location.WATERFORD',
+    'South Tipperary': 'Location.TIPPERARY',
+    'North Tipperary': 'Location.TIPPERARY',
+    'Wexford County': 'Location.WEXFORD',
+    'Carlow County': 'Location.CARLOW',
+    'Wicklow County': 'Location.WICKLOW',
+    'Kildare County': 'Location.KILDARE',
+    'Laois County': 'Location.LAOIS',
+    'Offaly County': 'Location.OFFALY',
+    'Galway County': 'Location.GALWAY',
+    'Galway City': 'Location.GALWAYCITY',
+    'Dún Laoghaire-Rathdown': 'Location.DUBLINDUNLAOGHAIRE',
+    'South Dublin': 'Location.DUBLINSOUTH',
+    Fingal: 'Location.DUBLINFINGAL',
+    'Dublin City': 'Location.DUBLINCITY',
+    'Waterford City': 'Location.WATERFORDCITY',
+    'Roscommon County': 'Location.ROSCOMMON',
+    'Meath County': 'Location.MEATH',
+    'Westmeath County': 'Location.WESTMEATH',
+    'Longford County': 'Location.LONGFORD',
+    'Mayo County': 'Location.MAYO',
+    'Louth County': 'Location.LOUTH',
+    'Monaghan County': 'Location.MONAGHAN',
+    'Cavan County': 'Location.CAVAN',
+    'Leitrim County': 'Location.LEITRIM',
+    'Sligo County': 'Location.SLIGO',
+    'Donegal County': 'Location.DONEGAL'
+  }
+
+  const fetchPropertyInfo = async (locationConstant) => {
     try {
+      console.log(locationConstant)
       // Fetch average rent
-      const rentResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/Location.GALWAYCITY/rent/3/house')
+      const rentResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/rent/3/house')
       if (!rentResponse.ok) throw new Error(`Rent API responded with status ${rentResponse.status}`)
       const rentData = await rentResponse.json()
       console.log(rentData)
@@ -47,7 +82,7 @@ const App = () => {
         maximumFractionDigits: 0
       }).format(rentData.average_rent))
       // Fetch average property price
-      const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/Location.GALWAYCITY/buy/3/house')
+      const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/buy/3/house')
       if (!buyResponse.ok) throw new Error(`Buy API responded with status ${buyResponse.status}`)
       const buyData = await buyResponse.json()
       console.log(buyData)
@@ -63,23 +98,21 @@ const App = () => {
     }
   }
 
-  // Function to handle eircode submit
   const handleSubmitPress = async () => {
     const customIcon = L.icon({
-      iconUrl: marker, // Update this path to your marker image
-      iconSize: [41, 41], // Size of the icon
-      iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
-      popupAnchor: [1, -34] // Point from which the popup should open relative to the iconAnchor
+      iconUrl: marker,
+      iconSize: [41, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
     })
-    await fetchPropertyInfo()
+    const locationConst = countyToLocationMapping[county]
+    await fetchPropertyInfo(locationConst)
 
-    // Extracting address from Bing Maps response
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
     setHomeMarker(hMarker)
-    // After adding the marker
     map.flyTo(location, 15, {
       animate: true,
-      duration: 3 // Duration in seconds
+      duration: 3
 
     }).once('zoomend', function () {
       // Adjust map view to ensure marker is visible
@@ -94,22 +127,22 @@ const App = () => {
 
     document.querySelector('.bg-overlay').classList.add('hidden')
     document.querySelector('.container').classList.add('hidden')
+    console.log(county)
   }
 
   const getJSONData = useCallback(() => {
-    fetch(geoJson) // Assuming your GeoJSON file is named data.geojson and located in the public directory
+    fetch(geoJson)
       .then((response) => response.json())
       .then((data) => {
         const polygons = data.features.filter(feature => feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')
 
         let isInside = false
         for (let i = 0; i < polygons.length; i++) {
-          // console.log(location)
           const point = [location[1], location[0]]
           if (turf.booleanPointInPolygon(point, polygons[i])) {
             isInside = true
             setCounty(polygons[i].properties.name)
-            break // Exit the loop if the point is found within a polygon
+            break
           }
         }
 
@@ -125,28 +158,25 @@ const App = () => {
     if (location) {
       getJSONData()
     }
-  }, [location, getJSONData]) // This will re-run the effect if location changes
+  }, [location, getJSONData])
 
   async function geocodeEircode (GeoEir) {
     const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`
 
-    // Return the fetch promise chain
     return fetch(bingGeocodingUrl)
       .then(response => response.json())
       .then(data => {
         if (data.resourceSets[0].resources.length > 0) {
           const resource = data.resourceSets[0].resources[0]
           const location1 = resource.point.coordinates
-          // Return the location in the format expected by the caller
-          return location1 // Make sure this is the actual path to the coordinates
+          return location1
         }
-        throw new Error('Location not found.') // Throw an error if no location is found
+        throw new Error('Location not found.')
       })
   }
 
   const handleWorkEircodeSubmit = async () => {
-    // Execute the route finding
-    const homeCoords = homeMarker ? homeMarker.getLatLng() : null // Use the home marker's coordinates
+    const homeCoords = homeMarker ? homeMarker.getLatLng() : null
     const workCoords = await geocodeEircode(workEircode)
     routing.setWaypoints([homeCoords, L.latLng(...workCoords)])
   }
