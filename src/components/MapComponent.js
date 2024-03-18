@@ -34,12 +34,12 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
       center: [53.3498, -6.2603],
       zoom: 7,
       maxZoom: 16,
-      minZoom: 7
+      minZoom: 7,
+      attributionControl: false
+
     })
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(mapRef.current)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapRef.current)
 
     const customIcon = L.icon({
       iconUrl: marker, // Update this path to your marker image

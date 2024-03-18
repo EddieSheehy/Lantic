@@ -58,7 +58,6 @@ body, html {
     justify-content: center;
     align-items: center;
     border-radius: 30px;
-    right: 30%;
     width: 30%;
     background-color: #4CAF50;
     box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
