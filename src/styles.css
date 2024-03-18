@@ -12,6 +12,11 @@ body, html {
     right: 0;
     z-index: 0;
   }
+
+  .locality-input.invalid,
+  .eircode-input.invalid {
+    border: 5px solid rgb(255, 3, 3);
+  }
   
   .bg-overlay {
     position: absolute;
@@ -197,7 +202,6 @@ body, html {
     color: black;
   }
   
-  .county-input,
   .locality-input,
   .eircode-input {
     font-size: 1em;

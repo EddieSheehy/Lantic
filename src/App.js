@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './styles.css'
@@ -19,8 +19,9 @@ const App = () => {
   const [averageRent, setAverageRent] = useState('')
   const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
   const [isFetching, setIsFetching] = useState(false)
-  const eircodeRef = useRef(null)
-  const localityRef = useRef(null)
+  const [eircode, setEircode] = useState('')
+  const [locality, setLocality] = useState('')
+  const [isValid, setIsValid] = useState(true)
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -86,8 +87,14 @@ const App = () => {
   }
 
   const handleSubmitPress = async () => {
+    if (!eircode.trim() || !locality.trim()) {
+      setIsValid(false) // Trigger validation failure style
+      return
+    }
+
+    // setIsValid(true)
     setIsFetching(true)
-    const eircodeValue = eircodeRef.current.value
+    const eircodeValue = eircode
     const customIcon = L.icon({
       iconUrl: marker,
       iconSize: [41, 41],
@@ -177,33 +184,37 @@ const App = () => {
       <div className="container">
         <div className="logo-placeholder"></div>
         <div className="subtitle">An all in one property lookup</div>
-        <input
-          type="text"
-          className="eircode-input"
-          placeholder="ENTER EIRCODE"
-          ref={eircodeRef}
-        />
-        <input
-        type="text"
-        className="locality-input"
-        placeholder="Area (St, estate or village)"
-        ref={localityRef}
-        />
-        <button
-    className="submit-button" disabled={isFetching} onClick={handleSubmitPress}>
-    Submit
-  </button>
-      </div>
+<input
+  type="text"
+  className={`eircode-input ${!isValid && !eircode ? 'invalid' : ''}`}
+  placeholder="ENTER EIRCODE"
+  value={eircode}
+  onChange={(e) => setEircode(e.target.value)}
+  onKeyPress={(e) => e.key === 'Enter' && handleSubmitPress()}
+/>
+<input
+  type="text"
+  className={`locality-input ${!isValid && !locality ? 'invalid' : ''}`}
+  placeholder="Area (St, estate or village)"
+  value={locality}
+  onChange={(e) => setLocality(e.target.value)}
+  onKeyPress={(e) => e.key === 'Enter' && handleSubmitPress()}
+/>
+<button
+  className="submit-button" disabled={isFetching} onClick={handleSubmitPress}>
+  Submit
+</button>
+</div>
 
     <div id="details-panel" className="details-panel hidden">
     <div className="details-header">
       <div className="details-eircode-box">
-      <span className="eircode-text">{eircodeRef.current?.value}</span>
+      <span className="eircode-text">{eircode}</span>
       </div>
       <span className="close-button">&times;</span>
     </div>
     <div className="details-body">
-      <h1>{localityRef.current?.value}, {county}, Ireland</h1>
+      <h1>{locality}, {county}, Ireland</h1>
       <div className="details-info">
         <p><strong>Details</strong></p>
         <p>Average Price of rent: {averageRent}</p>
