@@ -18,7 +18,17 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     fetch(geoJson)
       .then((response) => response.json())
       .then((data) => {
-        L.geoJSON(data).addTo(mapRef.current)
+        L.geoJSON(data, {
+          style: function (feature) {
+            return {
+              fillColor: 'orange',
+              weight: 0.5,
+              opacity: 0,
+              color: 'black', // color of the borders
+              fillOpacity: 0.1 // adjust opacity here
+            }
+          }
+        }).addTo(mapRef.current)
       })
     mapRef.current = L.map('map', {
       center: [53.3498, -6.2603],

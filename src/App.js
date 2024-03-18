@@ -40,13 +40,23 @@ const App = () => {
       if (!rentResponse.ok) throw new Error(`Rent API responded with status ${rentResponse.status}`)
       const rentData = await rentResponse.json()
       console.log(rentData)
-      setAverageRent(rentData.average_rent)
-
+      setAverageRent(new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(rentData.average_rent))
       // Fetch average property price
       const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/Location.GALWAYCITY/buy/3/house')
       if (!buyResponse.ok) throw new Error(`Buy API responded with status ${buyResponse.status}`)
       const buyData = await buyResponse.json()
-      setAveragePropertyPrice(buyData.average_price) // Assuming the API uses `average_price` for this field
+      console.log(buyData)
+      setAveragePropertyPrice(new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(buyData.average_rent))
     } catch (error) {
       console.error('Failed to fetch property information:', error)
       // Handle the error as appropriate for your application

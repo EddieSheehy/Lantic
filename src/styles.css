@@ -58,16 +58,22 @@ body, html {
     justify-content: center;
     align-items: center;
     border-radius: 30px;
-
-    right: 30%; /* Align to the right to use only half of the screen */
-    width:20%; /* Adjust width to use less than half of the screen for padding */
+    right: 30%;
+    width: 30%;
     background-color: #4CAF50;
+    box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
+    padding: 7px; /* Add some padding inside the box */
+    overflow: hidden; /* Hides any overflowing text */
   }
-
+  
   .eircode-text {
-    color:#000000;
-    padding:5px;
+    color: #ffffff;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-overflow: ellipsis; /* Adds ellipsis to text that overflows */
+    overflow: hidden; /* Hides any overflowing text */
+    max-width: 100%; /* Ensures text does not exceed the parent container */
   }
+  
 
   .details-panel {
     position: absolute;
