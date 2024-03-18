@@ -1,0 +1,20 @@
+[debug] [2024-03-17T13:09:37.403Z] ----------------------------------------------------------------------
+[debug] [2024-03-17T13:09:37.404Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only functions:echoString
+[debug] [2024-03-17T13:09:37.404Z] CLI Version:   9.18.0
+[debug] [2024-03-17T13:09:37.404Z] Platform:      darwin
+[debug] [2024-03-17T13:09:37.405Z] Node Version:  v16.15.1
+[debug] [2024-03-17T13:09:37.408Z] Time:          Sun Mar 17 2024 13:09:37 GMT+0000 (Greenwich Mean Time)
+[debug] [2024-03-17T13:09:37.408Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-03-17T13:09:37.431Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-03-17T13:09:37.431Z] > authorizing via signed-in user (eddie0sheehy@gmail.com)
+[debug] [2024-03-17T13:09:37.431Z] [iam] checking project lantic-a8dc1 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2024-03-17T13:09:37.433Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2024-03-17T13:09:37.433Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2024-03-17T13:09:37.673Z] <<< HTTP RESPONSE 200 {"expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","date":"Sun, 17 Mar 2024 13:09:37 GMT","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","server":"scaffolding on HTTPServer2","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2024-03-17T13:09:37.685Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/lantic-a8dc1:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2024-03-17T13:09:37.990Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 17 Mar 2024 13:09:38 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=135","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2024-03-17T13:09:37.992Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/lantic-a8dc1/serviceAccounts/lantic-a8dc1@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}

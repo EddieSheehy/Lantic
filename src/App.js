@@ -8,7 +8,6 @@ import marker from './marker.png'
 import * as turf from '@turf/turf'
 import geoJson from './ireland-counties.geojson'
 import useGeoLocation from './hooks/useGeoLocation'
-import axios from 'axios'
 
 // Component for the Map
 
@@ -22,6 +21,8 @@ const App = () => {
   const [routing, setRouting] = useState(null)
   const [homeMarker, setHomeMarker] = useState(null)
   const { location } = useGeoLocation(eircode)
+  const [averageRent, setAverageRent] = useState('')
+  const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
 
   // Function to handle eircode input change
   const handleEircodeChange = (event) => {
@@ -32,6 +33,26 @@ const App = () => {
     setlocality(event.target.value)
   }
 
+  const fetchPropertyInfo = async () => {
+    try {
+      // Fetch average rent
+      const rentResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/Location.GALWAYCITY/rent/3/house')
+      if (!rentResponse.ok) throw new Error(`Rent API responded with status ${rentResponse.status}`)
+      const rentData = await rentResponse.json()
+      console.log(rentData)
+      setAverageRent(rentData.average_rent)
+
+      // Fetch average property price
+      const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/Location.GALWAYCITY/buy/3/house')
+      if (!buyResponse.ok) throw new Error(`Buy API responded with status ${buyResponse.status}`)
+      const buyData = await buyResponse.json()
+      setAveragePropertyPrice(buyData.average_price) // Assuming the API uses `average_price` for this field
+    } catch (error) {
+      console.error('Failed to fetch property information:', error)
+      // Handle the error as appropriate for your application
+    }
+  }
+
   // Function to handle eircode submit
   const handleSubmitPress = async () => {
     const customIcon = L.icon({
@@ -40,20 +61,8 @@ const App = () => {
       iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
       popupAnchor: [1, -34] // Point from which the popup should open relative to the iconAnchor
     })
+    await fetchPropertyInfo()
 
-    try {
-      const response = await axios.post('https://us-central1-lantic-a8dc1.cloudfunctions.net/echoString', {
-        message: 'Hello, world!'
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      console.log('Message sent successfully:', response.data)
-    } catch (error) {
-      console.error('Error sending message:', error)
-    }
     // Extracting address from Bing Maps response
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
     setHomeMarker(hMarker)
@@ -170,8 +179,8 @@ const App = () => {
       <h1>{locality}, {county}, Ireland</h1>
       <div className="details-info">
         <p><strong>Details</strong></p>
-        <p>Average Price of rent: Data Scraped by grouping data from Daft</p>
-        <p>Average Price of property: Data Scraped by grouping data / querying data files from property price register</p>
+        <p>Average Price of rent: {averageRent}</p>
+        <p>Average Price of property: {averagePropertyPrice}</p>
       </div>
       <div className="details-actions">
         <div className="work-input-button">
