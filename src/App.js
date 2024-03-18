@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './styles.css'
@@ -7,29 +7,20 @@ import MapComponent from './components/MapComponent'
 import marker from './marker.png'
 import * as turf from '@turf/turf'
 import geoJson from './ireland-counties.geojson'
-import useGeoLocation from './hooks/useGeoLocation'
+// import useGeoLocation from './hooks/useGeoLocation'
 
 // Main App component
 const App = () => {
-  const [eircode, setEircode] = useState('')
-  const [locality, setlocality] = useState('')
   const [county, setCounty] = useState('')
   const [workEircode, setWorkEircode] = useState('')
   const [map, setMap] = useState(null)
   const [routing, setRouting] = useState(null)
   const [homeMarker, setHomeMarker] = useState(null)
-  const { location } = useGeoLocation(eircode)
   const [averageRent, setAverageRent] = useState('')
   const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
-
-  // Function to handle eircode input change
-  const handleEircodeChange = (event) => {
-    setEircode(event.target.value)
-  }
-
-  const handleLocalityChange = (event) => {
-    setlocality(event.target.value)
-  }
+  const [isFetching, setIsFetching] = useState(false)
+  const eircodeRef = useRef(null)
+  const localityRef = useRef(null)
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -69,12 +60,10 @@ const App = () => {
 
   const fetchPropertyInfo = async (locationConstant) => {
     try {
-      console.log(locationConstant)
       // Fetch average rent
       const rentResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/rent/3/house')
       if (!rentResponse.ok) throw new Error(`Rent API responded with status ${rentResponse.status}`)
       const rentData = await rentResponse.json()
-      console.log(rentData)
       setAverageRent(new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'EUR',
@@ -85,7 +74,6 @@ const App = () => {
       const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/buy/3/house')
       if (!buyResponse.ok) throw new Error(`Buy API responded with status ${buyResponse.status}`)
       const buyData = await buyResponse.json()
-      console.log(buyData)
       setAveragePropertyPrice(new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'EUR',
@@ -94,19 +82,21 @@ const App = () => {
       }).format(buyData.average_rent))
     } catch (error) {
       console.error('Failed to fetch property information:', error)
-      // Handle the error as appropriate for your application
     }
   }
 
   const handleSubmitPress = async () => {
+    setIsFetching(true)
+    const eircodeValue = eircodeRef.current.value
     const customIcon = L.icon({
       iconUrl: marker,
       iconSize: [41, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34]
     })
-    const locationConst = countyToLocationMapping[county]
-    await fetchPropertyInfo(locationConst)
+    const location = await geocodeEircode(eircodeValue)
+
+    getJSONData(location)
 
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
     setHomeMarker(hMarker)
@@ -115,7 +105,6 @@ const App = () => {
       duration: 3
 
     }).once('zoomend', function () {
-      // Adjust map view to ensure marker is visible
       map.panBy([document.getElementById('details-panel').offsetWidth / 2, 0], {
         duration: 0.2
       })
@@ -127,10 +116,10 @@ const App = () => {
 
     document.querySelector('.bg-overlay').classList.add('hidden')
     document.querySelector('.container').classList.add('hidden')
-    console.log(county)
+    setIsFetching(false)
   }
 
-  const getJSONData = useCallback(() => {
+  const getJSONData = useCallback((location) => {
     fetch(geoJson)
       .then((response) => response.json())
       .then((data) => {
@@ -138,27 +127,20 @@ const App = () => {
 
         let isInside = false
         for (let i = 0; i < polygons.length; i++) {
-          const point = [location[1], location[0]]
+          const point = [location[1], location[0]] // Ensure location is [latitude, longitude]
           if (turf.booleanPointInPolygon(point, polygons[i])) {
             isInside = true
             setCounty(polygons[i].properties.name)
             break
           }
         }
-
-        if (isInside) {
-          console.log('The point is inside the GeoJSON area.')
+        if (!isInside) {
+          console.log('The point is not inside any known county')
         } else {
-          console.log('The point is not inside the GeoJSON area.')
+          console.log('INSIDE')
         }
       })
-  }, [location])
-
-  useEffect(() => {
-    if (location) {
-      getJSONData()
-    }
-  }, [location, getJSONData])
+  }, [])
 
   async function geocodeEircode (GeoEir) {
     const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`
@@ -174,6 +156,13 @@ const App = () => {
         throw new Error('Location not found.')
       })
   }
+
+  useEffect(() => {
+    if (county) {
+      const locationConst = countyToLocationMapping[county]
+      fetchPropertyInfo(locationConst)
+    }
+  }, [county])
 
   const handleWorkEircodeSubmit = async () => {
     const homeCoords = homeMarker ? homeMarker.getLatLng() : null
@@ -192,18 +181,16 @@ const App = () => {
           type="text"
           className="eircode-input"
           placeholder="ENTER EIRCODE"
-          value={eircode}
-          onChange={handleEircodeChange}
+          ref={eircodeRef}
         />
         <input
         type="text"
         className="locality-input"
         placeholder="Area (St, estate or village)"
-        value={locality}
-        onChange={handleLocalityChange}
+        ref={localityRef}
         />
         <button
-    className="submit-button" onClick={handleSubmitPress}>
+    className="submit-button" disabled={isFetching} onClick={handleSubmitPress}>
     Submit
   </button>
       </div>
@@ -211,12 +198,12 @@ const App = () => {
     <div id="details-panel" className="details-panel hidden">
     <div className="details-header">
       <div className="details-eircode-box">
-      <span className="eircode-text">{eircode}</span>
+      <span className="eircode-text">{eircodeRef.current?.value}</span>
       </div>
       <span className="close-button">&times;</span>
     </div>
     <div className="details-body">
-      <h1>{locality}, {county}, Ireland</h1>
+      <h1>{localityRef.current?.value}, {county}, Ireland</h1>
       <div className="details-info">
         <p><strong>Details</strong></p>
         <p>Average Price of rent: {averageRent}</p>
