@@ -61,12 +61,6 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     const routingControl = L.Routing.control({
       createMarker: function (i, wp) {
         const marker = L.marker(wp.latLng, { draggable: false, icon: customIcon })
-        if (i === 0) {
-          mapRef.current.flyTo(wp.latLng, 15, {
-            animate: true,
-            duration: 3
-          })
-        }
         return marker
       }
     }).addTo(mapRef.current)
@@ -77,7 +71,19 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
       // Calculate time in minutes and distance in kilometers
       const timeInMinutes = Math.round(summary.totalTime / 60)
       const distanceInKilometers = (summary.totalDistance / 1000).toFixed(2)
-      console.log(`Time: ${timeInMinutes} minutes, Distance: ${distanceInKilometers} km`)
+
+      // Create content for the popup
+      const popupContent = `Time: ${timeInMinutes} minutes<br>Distance: ${distanceInKilometers} km`
+
+      // Assume we want the popup on the destination marker
+      // routes[0].inputWaypoints gives us the start and end waypoints
+      const destinationLatLng = routes[0].inputWaypoints[routes[0].inputWaypoints.length - 1].latLng
+
+      // Create and open the popup at the destination
+      L.popup()
+        .setLatLng(destinationLatLng)
+        .setContent(popupContent)
+        .openOn(mapRef.current)
     })
 
     if (setRouting) {
