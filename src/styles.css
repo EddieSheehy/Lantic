@@ -17,6 +17,12 @@ body, html {
   .eircode-input.invalid {
     border: 5px solid rgb(255, 3, 3);
   }
+
+  .amenities-button.red {
+    background-color: rgb(214, 34, 34);
+    color: white; /* Change text color to ensure readability */
+    /* Add any other styling as needed */
+  }
   
   .bg-overlay {
     position: absolute;

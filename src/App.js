@@ -7,7 +7,8 @@ import MapComponent from './components/MapComponent'
 import marker from './marker.png'
 import * as turf from '@turf/turf'
 import geoJson from './ireland-counties.geojson'
-// import useGeoLocation from './hooks/useGeoLocation'
+import { fetchAveragePropertyPrice, fetchAverageRent, geocodeEircode } from './utils/utils'
+import { queryOverpassAPI } from './utils/utils-amenities'
 
 // Main App component
 const App = () => {
@@ -16,12 +17,14 @@ const App = () => {
   const [map, setMap] = useState(null)
   const [routing, setRouting] = useState(null)
   const [homeMarker, setHomeMarker] = useState(null)
-  const [averageRent, setAverageRent] = useState('')
-  const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [eircode, setEircode] = useState('')
   const [locality, setLocality] = useState('')
   const [isValid, setIsValid] = useState(true)
+  const [amenitiesMarkers, setAmenitiesMarkers] = useState([])
+  const [showAmenities, setShowAmenities] = useState(false)
+  const [averageRent, setAverageRent] = useState('')
+  const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -59,40 +62,12 @@ const App = () => {
     'Donegal County': 'Location.DONEGAL'
   }
 
-  const fetchPropertyInfo = async (locationConstant) => {
-    try {
-      // Fetch average rent
-      const rentResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/rent/3/house')
-      if (!rentResponse.ok) throw new Error(`Rent API responded with status ${rentResponse.status}`)
-      const rentData = await rentResponse.json()
-      setAverageRent(new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(rentData.average_rent))
-      // Fetch average property price
-      const buyResponse = await fetch('https://propertyapi-4whpfun42q-uc.a.run.app/listings/' + locationConstant + '/buy/3/house')
-      if (!buyResponse.ok) throw new Error(`Buy API responded with status ${buyResponse.status}`)
-      const buyData = await buyResponse.json()
-      setAveragePropertyPrice(new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(buyData.average_rent))
-    } catch (error) {
-      console.error('Failed to fetch property information:', error)
-    }
-  }
-
   const handleSubmitPress = async () => {
     if (!eircode.trim() || !locality.trim()) {
       setIsValid(false) // Trigger validation failure style
       return
     }
 
-    // setIsValid(true)
     setIsFetching(true)
     const eircodeValue = eircode
     const customIcon = L.icon({
@@ -149,25 +124,19 @@ const App = () => {
       })
   }, [])
 
-  async function geocodeEircode (GeoEir) {
-    const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`
-
-    return fetch(bingGeocodingUrl)
-      .then(response => response.json())
-      .then(data => {
-        if (data.resourceSets[0].resources.length > 0) {
-          const resource = data.resourceSets[0].resources[0]
-          const location1 = resource.point.coordinates
-          return location1
-        }
-        throw new Error('Location not found.')
-      })
-  }
-
   useEffect(() => {
     if (county) {
       const locationConst = countyToLocationMapping[county]
-      fetchPropertyInfo(locationConst)
+      fetchAverageRent(locationConst).then(rent => {
+        setAverageRent(rent)
+      }).catch(error => {
+        console.error('Error fetching rent:', error)
+      })
+      fetchAveragePropertyPrice(locationConst).then(propertyPrice => {
+        setAveragePropertyPrice(propertyPrice)
+      }).catch(error => {
+        console.error('Error fetching rent:', error)
+      })
     }
   }, [county])
 
@@ -175,6 +144,23 @@ const App = () => {
     const homeCoords = homeMarker ? homeMarker.getLatLng() : null
     const workCoords = await geocodeEircode(workEircode)
     routing.setWaypoints([homeCoords, L.latLng(...workCoords)])
+  }
+
+  const handleAmenitiesClick = async () => {
+    if (!showAmenities) {
+      const homeCoords = homeMarker ? homeMarker.getLatLng() : null
+      if (homeCoords) {
+        const markers = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
+        setAmenitiesMarkers(markers)
+        setShowAmenities(true)
+      } else {
+        alert('Home location is not set.')
+      }
+    } else {
+      amenitiesMarkers.forEach(marker => map.removeLayer(marker))
+      setAmenitiesMarkers([])
+      setShowAmenities(false)
+    }
   }
 
   return (
@@ -229,8 +215,11 @@ const App = () => {
         <button className="flood-button" onClick={() => { window.location.href = 'https://www.floodinfo.ie/map/floodmaps/' }}>Flooding Information</button>
         </div>
         </div>
-        <button className="amenities-button" onClick={() => alert('To Be Added.')}>Click for Nearby Amenities</button>
-
+        <button
+  className={`amenities-button ${showAmenities ? 'red' : ''}`}
+  onClick={handleAmenitiesClick}>
+  {showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities'}
+</button>
     </div>
   </div>
     </div>
