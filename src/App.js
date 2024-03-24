@@ -10,7 +10,6 @@ import geoJson from './ireland-counties.geojson'
 import { fetchAveragePropertyPrice, fetchAverageRent, geocodeEircode } from './utils/utils'
 import { queryOverpassAPI } from './utils/utils-amenities'
 
-// Main App component
 const App = () => {
   const [county, setCounty] = useState('')
   const [workEircode, setWorkEircode] = useState('')
@@ -25,6 +24,8 @@ const App = () => {
   const [showAmenities, setShowAmenities] = useState(false)
   const [averageRent, setAverageRent] = useState('')
   const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
+  const [geocodeError, setGeocodeError] = useState('')
+  const [workGeocodeError, setWorkGeocodeError] = useState('')
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -78,6 +79,12 @@ const App = () => {
     })
     const location = await geocodeEircode(eircodeValue)
 
+    if (!location) {
+      setGeocodeError('Invalid Eircode')
+      setIsFetching(false)
+      return
+    }
+
     getJSONData(location)
 
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
@@ -107,19 +114,12 @@ const App = () => {
       .then((data) => {
         const polygons = data.features.filter(feature => feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')
 
-        let isInside = false
         for (let i = 0; i < polygons.length; i++) {
-          const point = [location[1], location[0]] // Ensure location is [latitude, longitude]
+          const point = [location[1], location[0]]
           if (turf.booleanPointInPolygon(point, polygons[i])) {
-            isInside = true
             setCounty(polygons[i].properties.name)
             break
           }
-        }
-        if (!isInside) {
-          console.log('The point is not inside any known county')
-        } else {
-          console.log('INSIDE')
         }
       })
   }, [])
@@ -141,8 +141,13 @@ const App = () => {
   }, [county])
 
   const handleWorkEircodeSubmit = async () => {
+    setWorkGeocodeError('')
     const homeCoords = homeMarker ? homeMarker.getLatLng() : null
     const workCoords = await geocodeEircode(workEircode)
+    if (!workCoords) {
+      setWorkGeocodeError('Invalid Eircode')
+      return
+    }
     routing.setWaypoints([homeCoords, L.latLng(...workCoords)])
   }
 
@@ -170,20 +175,26 @@ const App = () => {
       <div className="container">
         <div className="logo-placeholder"></div>
         <div className="subtitle">An all in one property lookup</div>
-<input
+        <input
   type="text"
-  className={`eircode-input ${!isValid && !eircode ? 'invalid' : ''}`}
+  className={`eircode-input ${(!isValid || geocodeError) ? 'invalid' : ''}`}
   placeholder="ENTER EIRCODE"
   value={eircode}
-  onChange={(e) => setEircode(e.target.value)}
+  onChange={(e) => {
+    setEircode(e.target.value)
+    setGeocodeError('') // Clear geocode error when user is correcting the input
+    if (geocodeError) setIsValid(true) // Reset isValid when user starts correcting an error
+  }}
   onKeyPress={(e) => e.key === 'Enter' && handleSubmitPress()}
 />
+{geocodeError && <div className="error-message">{geocodeError}</div>}
+
 <input
   type="text"
   className={`locality-input ${!isValid && !locality ? 'invalid' : ''}`}
   placeholder="Area (St, estate or village)"
   value={locality}
-  onChange={(e) => setLocality(e.target.value)}
+  onChange={(e) => { setLocality(e.target.value); setGeocodeError('') }}
   onKeyPress={(e) => e.key === 'Enter' && handleSubmitPress()}
 />
 <button
@@ -208,7 +219,18 @@ const App = () => {
       </div>
       <div className="details-actions">
         <div className="work-input-button">
-        <input type="text" className="workEircodeInput" placeholder="Enter Work Eircode" value={workEircode} onChange={(e) => setWorkEircode(e.target.value)}/>
+        <input
+          type="text"
+          className={`workEircodeInput ${(!isValid || workGeocodeError) ? 'invalid' : ''}`}
+          placeholder="Enter Work Eircode"
+          value={workEircode}
+          onChange={(e) => {
+            setWorkEircode(e.target.value)
+            setWorkGeocodeError('')
+            if (workGeocodeError) setIsValid(true)
+          }}
+/>
+{workGeocodeError && <div className="error-message">{workGeocodeError}</div>}
         <button className="commute-button" onClick={() => handleWorkEircodeSubmit()}>Calculate Commute</button>
         </div>
         <div className= "flood-button-container">

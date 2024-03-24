@@ -45,6 +45,10 @@ const geocodeEircode = async (GeoEir) => {
     if (data.resourceSets[0].resources.length > 0) {
       const resource = data.resourceSets[0].resources[0]
       const location1 = resource.point.coordinates
+      const forbiddenLocation = [52.86519623, -7.97945976]
+      if (location1[0] === forbiddenLocation[0] && location1[1] === forbiddenLocation[1]) {
+        throw new Error('This location is not allowed.')
+      }
       return location1
     }
     throw new Error('Location not found.')
