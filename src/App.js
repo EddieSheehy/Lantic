@@ -63,9 +63,41 @@ const App = () => {
     'Donegal County': 'Location.DONEGAL'
   }
 
+  const handleCloseButtonClick = () => {
+    // Hide details panel with a transition
+    const detailsPanel = document.getElementById('details-panel')
+    detailsPanel.classList.add('hidden')
+    detailsPanel.classList.remove('show')
+
+    // Show the background overlay with a transition
+    const bgOverlay = document.querySelector('.bg-overlay')
+    const container = document.querySelector('.container')
+    bgOverlay.classList.remove('hidden')
+    container.classList.remove('hidden')
+
+    // Reset the form fields
+    setEircode('')
+    setLocality('')
+    setGeocodeError('')
+    setWorkGeocodeError('')
+    setIsValid(true)
+
+    if (homeMarker) {
+      map.removeLayer(homeMarker)
+      setHomeMarker(null)
+    }
+    if (routing) {
+      routing.setWaypoints([])
+    }
+
+    setTimeout(() => {
+      map.flyTo([53.3498, -6.2603], 7, { animate: true, duration: 2 })
+    }, 500)
+  }
+
   const handleSubmitPress = async () => {
     if (!eircode.trim() || !locality.trim()) {
-      setIsValid(false) // Trigger validation failure style
+      setIsValid(false)
       return
     }
 
@@ -208,7 +240,7 @@ const App = () => {
       <div className="details-eircode-box">
       <span className="eircode-text">{eircode}</span>
       </div>
-      <span className="close-button">&times;</span>
+      <span className="close-button" onClick={handleCloseButtonClick}>&times;</span>
     </div>
     <div className="details-body">
       <h1>{locality}, {county}, Ireland</h1>

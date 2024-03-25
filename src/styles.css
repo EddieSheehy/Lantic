@@ -28,6 +28,29 @@ body, html {
   display: inline-block;
   }
 
+  .details-panel {
+    transition: transform 0.5s, opacity 0.5s;
+  }
+  
+  .details-panel.hidden {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  
+  .details-panel.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .bg-overlay, .container {
+    transition: opacity 0.5s;
+  }
+  
+  .bg-overlay.hidden, .container.hidden {
+    opacity: 0;
+  }
+  
+
   .locality-input.invalid,
   .eircode-input.invalid {
     border: 5px solid rgb(255, 3, 3);
@@ -136,9 +159,22 @@ body, html {
   }
   
   .close-button {
-    cursor: pointer;
+    cursor: pointer; 
+    padding: 1.5px; 
+    display: inline-block;
+    border-radius: 50%; 
+    background-color: #ff0000;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: absolute;
+    top: 10px; 
+    right: 10px; 
+    width: 25px; 
+    height: 25px; 
+    line-height: 25px; 
   }
-  
   .details-info p {
     margin: 5px 0;
   }
