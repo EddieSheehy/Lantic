@@ -26,6 +26,7 @@ const App = () => {
   const [averagePropertyPrice, setAveragePropertyPrice] = useState('')
   const [geocodeError, setGeocodeError] = useState('')
   const [workGeocodeError, setWorkGeocodeError] = useState('')
+  const [amenitiesError, setAmenitiesError] = useState('')
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -69,13 +70,11 @@ const App = () => {
     detailsPanel.classList.add('hidden')
     detailsPanel.classList.remove('show')
 
-    // Show the background overlay with a transition
     const bgOverlay = document.querySelector('.bg-overlay')
     const container = document.querySelector('.container')
     bgOverlay.classList.remove('hidden')
     container.classList.remove('hidden')
 
-    // Reset the form fields
     setEircode('')
     setLocality('')
     setGeocodeError('')
@@ -86,9 +85,15 @@ const App = () => {
       map.removeLayer(homeMarker)
       setHomeMarker(null)
     }
+
     if (routing) {
       routing.setWaypoints([])
     }
+
+    amenitiesMarkers.forEach(marker => map.removeLayer(marker))
+    setAmenitiesMarkers([])
+
+    setShowAmenities(false)
 
     setTimeout(() => {
       map.flyTo([53.3498, -6.2603], 7, { animate: true, duration: 2 })
@@ -184,14 +189,20 @@ const App = () => {
   }
 
   const handleAmenitiesClick = async () => {
+    setAmenitiesError('')
     if (!showAmenities) {
       const homeCoords = homeMarker ? homeMarker.getLatLng() : null
       if (homeCoords) {
-        const markers = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
-        setAmenitiesMarkers(markers)
-        setShowAmenities(true)
+        let markers = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
+        markers = []
+        if (markers.length > 0) {
+          setAmenitiesMarkers(markers)
+          setShowAmenities(true)
+        } else {
+          setAmenitiesError('No amenities found in this area or there was an error fetching the data.')
+        }
       } else {
-        alert('Home location is not set.')
+        setAmenitiesError('Home location is not set.')
       }
     } else {
       amenitiesMarkers.forEach(marker => map.removeLayer(marker))
@@ -274,6 +285,7 @@ const App = () => {
   onClick={handleAmenitiesClick}>
   {showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities'}
 </button>
+{amenitiesError && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{amenitiesError}</div>}
     </div>
   </div>
     </div>
