@@ -222,7 +222,10 @@ body, html {
   margin-left: 10px; 
   }
 
-  
+  .grey-out {
+    background-color: grey !important; /* Override other styles */
+    color: white !important;
+  }  
 
   .flood-button {
     display: block;

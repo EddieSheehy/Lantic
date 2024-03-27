@@ -109,7 +109,6 @@ const App = () => {
     setIsFetching(true)
     const eircodeValue = eircode
 
-    // Sets the markers size, image and offset
     const customIcon = L.icon({
       iconUrl: marker,
       iconSize: [41, 41],
@@ -117,7 +116,6 @@ const App = () => {
       popupAnchor: [1, -34]
     })
 
-    // Gets the long and lat of the Eircode
     const location = await geocodeEircode(eircodeValue)
 
     if (!location) {
@@ -126,14 +124,11 @@ const App = () => {
       return
     }
 
-    // Calls the function to utilise 'turf' to check if the location is within
-    // the geoJSON.
     getJSONData(location)
 
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
     setHomeMarker(hMarker)
 
-    // Handles the styling animations of removing, showing overlays.
     map.flyTo(location, 15, {
       animate: true,
       duration: 3
@@ -196,18 +191,26 @@ const App = () => {
   }
 
   const handleAmenitiesClick = async () => {
+    setIsFetching(true)
+
     if (showAmenities) {
       setShowAmenities(false)
       amenitiesMarkers.forEach(marker => map.removeLayer(marker))
       setAmenitiesMarkers([])
+      setIsFetching(false)
     } else {
       setAmenitiesError('')
       const homeCoords = homeMarker ? homeMarker.getLatLng() : null
       if (homeCoords) {
-        const amenitiesData = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
-        setAmenitiesMarkers(amenitiesData) // Store the structured data
-        setShowAmenities(true)
+        try {
+          const amenitiesData = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
+          setAmenitiesMarkers(amenitiesData)
+          setShowAmenities(true)
+        } catch (error) {
+          setAmenitiesError('Failed to fetch amenities.')
+        }
       }
+      setIsFetching(false)
     }
   }
 
@@ -225,8 +228,8 @@ const App = () => {
   value={eircode}
   onChange={(e) => {
     setEircode(e.target.value)
-    setGeocodeError('') // Clear geocode error when user is correcting the input
-    if (geocodeError) setIsValid(true) // Reset isValid when user starts correcting an error
+    setGeocodeError('')
+    if (geocodeError) setIsValid(true)
   }}
   onKeyPress={(e) => e.key === 'Enter' && handleSubmitPress()}
 />
@@ -281,9 +284,11 @@ const App = () => {
         </div>
         </div>
         <button
-  className={`amenities-button ${showAmenities ? 'red' : ''}`}
-  onClick={handleAmenitiesClick}>
-  {showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities'}
+  className={`amenities-button ${showAmenities ? 'red' : ''} ${isFetching ? 'grey-out' : ''}`}
+  onClick={handleAmenitiesClick}
+  disabled={isFetching}
+>
+  {isFetching ? 'Loading...' : (showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities')}
 </button>
 {showAmenities && <AmenitiesList amenities={amenitiesMarkers} map={map} />}
 {amenitiesError && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{amenitiesError}</div>}
