@@ -285,7 +285,7 @@ const App = () => {
   onClick={handleAmenitiesClick}>
   {showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities'}
 </button>
-{showAmenities && <AmenitiesList amenities={amenitiesMarkers} />}
+{showAmenities && <AmenitiesList amenities={amenitiesMarkers} map={map} />}
 {amenitiesError && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{amenitiesError}</div>}
     </div>
   </div>

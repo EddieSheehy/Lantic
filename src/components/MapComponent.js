@@ -33,7 +33,6 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     mapRef.current = L.map('map', {
       center: [53.3498, -6.2603],
       zoom: 7,
-      maxZoom: 16,
       minZoom: 7,
       attributionControl: false
 
@@ -42,16 +41,15 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapRef.current)
 
     const customIcon = L.icon({
-      iconUrl: marker, // Update this path to your marker image
-      iconSize: [41, 41], // Size of the icon
-      iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
-      popupAnchor: [1, -34] // Point from which the popup should open relative to the iconAnchor
+      iconUrl: marker,
+      iconSize: [41, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
     })
 
-    const southWest = L.latLng(48, -12) // Replace with your desired southwest corner coordinates
-    const northEast = L.latLng(56, -2) // Replace with your desired northeast corner coordinates
+    const southWest = L.latLng(48, -12)
+    const northEast = L.latLng(56, -2)
 
-    // Set the maximum bounds for the map
     mapRef.current.setMaxBounds(L.latLngBounds(southWest, northEast))
 
     if (onMapLoad) {
@@ -68,18 +66,13 @@ const MapComponent = ({ onMapLoad, setRouting }) => {
     routingControl.on('routesfound', function (e) {
       const routes = e.routes
       const summary = routes[0].summary
-      // Calculate time in minutes and distance in kilometers
       const timeInMinutes = Math.round(summary.totalTime / 60)
       const distanceInKilometers = (summary.totalDistance / 1000).toFixed(2)
 
-      // Create content for the popup
       const popupContent = `Time: ${timeInMinutes} minutes<br>Distance: ${distanceInKilometers} km`
 
-      // Assume we want the popup on the destination marker
-      // routes[0].inputWaypoints gives us the start and end waypoints
       const destinationLatLng = routes[0].inputWaypoints[routes[0].inputWaypoints.length - 1].latLng
 
-      // Create and open the popup at the destination
       L.popup()
         .setLatLng(destinationLatLng)
         .setContent(popupContent)

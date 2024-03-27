@@ -3,13 +3,12 @@ import PropTypes from 'prop-types'
 import parse from 'html-react-parser'
 import AmenityItem from './amenityComponent'
 
-const AmenitiesList = ({ amenities }) => {
+const AmenitiesList = ({ amenities, map }) => {
   const [openType, setOpenType] = useState(null)
   const groupAmenitiesByType = (amenities) => {
     const grouped = {}
     amenities.forEach((amenity) => {
       const amenityhtml = amenity._popup._content
-
       let header = null
       const dropdownContent = []
       let type = 'unknown'
@@ -69,13 +68,16 @@ const AmenitiesList = ({ amenities }) => {
           {openType === type && (
             <ul>
               {groupedAmenities[type].map((amenity, index) => (
-                <AmenityItem
-                  key={index}
-                  type={type}
-                  header={amenity.header}
-                  details={amenity.details}
-                />
+  <AmenityItem
+    key={index}
+    type={type}
+    header={amenity.header}
+    details={amenity.details}
+    _latlng={amenity._latlng}
+    map={map}
+  />
               ))}
+
             </ul>
           )}
         </div>
@@ -89,7 +91,9 @@ AmenitiesList.propTypes = {
     PropTypes.shape({
       type: PropTypes.string
     })
-  ).isRequired
+  ).isRequired,
+  map: PropTypes.object
+
 }
 
 export default AmenitiesList

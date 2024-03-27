@@ -50,7 +50,6 @@ export async function queryOverpassAPI (lat, lon, map) {
     data.elements.forEach(element => {
       if (element.tags && element.lat && element.lon) {
         const amenityType = element.tags.amenity
-        // Check for missing name and adjust based on amenityType
         if (!element.tags.name) {
           if (amenityType === 'parking') {
             element.tags.name = 'Parking'
