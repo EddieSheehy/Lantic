@@ -12,6 +12,7 @@
     "fastify": "^4.26.2",
     "fastify-cors": "^6.1.0",
     "firebase": "^10.9.0",
+    "html-react-parser": "^5.1.9",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "prop-types": "^15.8.1",

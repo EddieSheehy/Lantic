@@ -9,6 +9,7 @@ import * as turf from '@turf/turf'
 import geoJson from './ireland-counties.geojson'
 import { fetchAveragePropertyPrice, fetchAverageRent, geocodeEircode } from './utils/utils'
 import { queryOverpassAPI } from './utils/utils-amenities'
+import AmenitiesList from './components/amenityList'
 
 const App = () => {
   const [county, setCounty] = useState('')
@@ -65,7 +66,6 @@ const App = () => {
   }
 
   const handleCloseButtonClick = () => {
-    // Hide details panel with a transition
     const detailsPanel = document.getElementById('details-panel')
     detailsPanel.classList.add('hidden')
     detailsPanel.classList.remove('show')
@@ -108,12 +108,16 @@ const App = () => {
 
     setIsFetching(true)
     const eircodeValue = eircode
+
+    // Sets the markers size, image and offset
     const customIcon = L.icon({
       iconUrl: marker,
       iconSize: [41, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34]
     })
+
+    // Gets the long and lat of the Eircode
     const location = await geocodeEircode(eircodeValue)
 
     if (!location) {
@@ -122,10 +126,14 @@ const App = () => {
       return
     }
 
+    // Calls the function to utilise 'turf' to check if the location is within
+    // the geoJSON.
     getJSONData(location)
 
     const hMarker = L.marker(location, { icon: customIcon }).addTo(map)
     setHomeMarker(hMarker)
+
+    // Handles the styling animations of removing, showing overlays.
     map.flyTo(location, 15, {
       animate: true,
       duration: 3
@@ -135,7 +143,6 @@ const App = () => {
         duration: 0.2
       })
 
-      // Show the property details overlay once the zoom animation ends
       document.getElementById('details-panel').classList.remove('hidden')
       document.getElementById('details-panel').classList.add('show')
     })
@@ -189,25 +196,18 @@ const App = () => {
   }
 
   const handleAmenitiesClick = async () => {
-    setAmenitiesError('')
-    if (!showAmenities) {
-      const homeCoords = homeMarker ? homeMarker.getLatLng() : null
-      if (homeCoords) {
-        let markers = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
-        markers = []
-        if (markers.length > 0) {
-          setAmenitiesMarkers(markers)
-          setShowAmenities(true)
-        } else {
-          setAmenitiesError('No amenities found in this area or there was an error fetching the data.')
-        }
-      } else {
-        setAmenitiesError('Home location is not set.')
-      }
-    } else {
+    if (showAmenities) {
+      setShowAmenities(false)
       amenitiesMarkers.forEach(marker => map.removeLayer(marker))
       setAmenitiesMarkers([])
-      setShowAmenities(false)
+    } else {
+      setAmenitiesError('')
+      const homeCoords = homeMarker ? homeMarker.getLatLng() : null
+      if (homeCoords) {
+        const amenitiesData = await queryOverpassAPI(homeCoords.lat, homeCoords.lng, map)
+        setAmenitiesMarkers(amenitiesData) // Store the structured data
+        setShowAmenities(true)
+      }
     }
   }
 
@@ -285,6 +285,7 @@ const App = () => {
   onClick={handleAmenitiesClick}>
   {showAmenities ? 'Hide Nearby Amenities' : 'Click for Nearby Amenities'}
 </button>
+{showAmenities && <AmenitiesList amenities={amenitiesMarkers} />}
 {amenitiesError && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{amenitiesError}</div>}
     </div>
   </div>

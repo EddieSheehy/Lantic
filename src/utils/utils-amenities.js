@@ -27,7 +27,7 @@ function getAmenityIcon (amenityType) {
   const iconUrl = amenityIcons[amenityType] || 'icons/amenity_unknown.ico' // Default icon if type not found
   return L.icon({
     iconUrl,
-    iconSize: [21, 21], // Adjust size as needed
+    iconSize: [21, 21],
     iconAnchor: [21, 20],
     popupAnchor: [-4, -24]
   })
@@ -50,12 +50,23 @@ export async function queryOverpassAPI (lat, lon, map) {
     data.elements.forEach(element => {
       if (element.tags && element.lat && element.lon) {
         const amenityType = element.tags.amenity
+        // Check for missing name and adjust based on amenityType
+        if (!element.tags.name) {
+          if (amenityType === 'parking') {
+            element.tags.name = 'Parking'
+          } else if (amenityType === 'atm') {
+            element.tags.name = 'ATM'
+          } else {
+            element.tags.name = 'No name provided'
+          }
+        }
+
         const markerIcon = getAmenityIcon(amenityType)
         const marker = L.marker([element.lat, element.lon], { icon: markerIcon }).addTo(map)
 
-        marker.bindTooltip(element.tags.name || 'Unknown', { permanent: false, direction: 'auto' })
+        marker.bindTooltip(element.tags.name, { permanent: false, direction: 'auto' })
 
-        let popupContent = `<strong>${element.tags.name || 'No name provided'}</strong><br>`
+        let popupContent = `<strong>${element.tags.name}</strong><br>`
         popupContent += `Type: ${amenityType}<br>`
         if (element.tags.opening_hours) {
           popupContent += `Opening Hours: ${element.tags.opening_hours}<br>`
@@ -76,3 +87,5 @@ export async function queryOverpassAPI (lat, lon, map) {
     return []
   }
 }
+
+export { getAmenityIcon }
