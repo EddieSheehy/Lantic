@@ -1,7 +1,7 @@
 // Function to fetch property rent information
-const fetchAverageRent = async (locationConstant) => {
+const fetchAverageRent = async (locationConstant, numBedrooms, propertyType) => {
   try {
-    const response = await fetch(`https://propertyapi-4whpfun42q-uc.a.run.app/listings/${locationConstant}/rent/3/house`)
+    const response = await fetch(`https://propertyapi-4whpfun42q-uc.a.run.app/listings/${locationConstant}/rent/${numBedrooms}/${propertyType}`)
     if (!response.ok) throw new Error(`Rent API responded with status ${response.status}`)
     const data = await response.json()
     const average = new Intl.NumberFormat('en-US', {
@@ -18,9 +18,9 @@ const fetchAverageRent = async (locationConstant) => {
 }
 
 // Function to fetch property price information
-const fetchAveragePropertyPrice = async (locationConstant) => {
+const fetchAveragePropertyPrice = async (locationConstant, numBedrooms, propertyType) => {
   try {
-    const response = await fetch(`https://propertyapi-4whpfun42q-uc.a.run.app/listings/${locationConstant}/buy/3/house`)
+    const response = await fetch(`https://propertyapi-4whpfun42q-uc.a.run.app/listings/${locationConstant}/buy/${numBedrooms}/${propertyType}`)
     if (!response.ok) throw new Error(`Rent API responded with status ${response.status}`)
     const data = await response.json()
     const average = new Intl.NumberFormat('en-US', {

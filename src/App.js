@@ -28,6 +28,9 @@ const App = () => {
   const [geocodeError, setGeocodeError] = useState('')
   const [workGeocodeError, setWorkGeocodeError] = useState('')
   const [amenitiesError, setAmenitiesError] = useState('')
+  const [bedrooms, setBedrooms] = useState(3)
+  const [housingType, setHousingType] = useState('house')
+  const [showSettings, setShowSettings] = useState(false)
 
   const countyToLocationMapping = {
     'Kerry County': 'Location.KERRY',
@@ -166,18 +169,18 @@ const App = () => {
   useEffect(() => {
     if (county) {
       const locationConst = countyToLocationMapping[county]
-      fetchAverageRent(locationConst).then(rent => {
+      fetchAverageRent(locationConst, bedrooms, housingType).then(rent => {
         setAverageRent(rent)
       }).catch(error => {
         console.error('Error fetching rent:', error)
       })
-      fetchAveragePropertyPrice(locationConst).then(propertyPrice => {
+      fetchAveragePropertyPrice(locationConst, bedrooms, housingType).then(propertyPrice => {
         setAveragePropertyPrice(propertyPrice)
       }).catch(error => {
-        console.error('Error fetching rent:', error)
+        console.error('Error fetching property price:', error)
       })
     }
-  }, [county])
+  }, [county, bedrooms, housingType])
 
   const handleWorkEircodeSubmit = async () => {
     setWorkGeocodeError('')
@@ -257,11 +260,36 @@ const App = () => {
       <span className="close-button" onClick={handleCloseButtonClick}>&times;</span>
     </div>
     <div className="details-body">
-      <h1>{locality}, {county}, Ireland</h1>
-      <div className="details-info">
-        <p><strong>Details</strong></p>
-        <p>Average Price of rent: {averageRent}</p>
-        <p>Average Price of property: {averagePropertyPrice}</p>
+  <h1>{locality}, {county}, Ireland</h1>
+  <div className="details-info">
+    <div className="details-header-settings">
+      <p><strong>Details</strong></p>
+      <div className="settings-icon" onClick={() => setShowSettings(true)}>⚙️</div>
+    </div>
+    <p>Average Price of rent: {averageRent}</p>
+    <p>Average Price of property: {averagePropertyPrice}</p>
+
+{showSettings && (
+  <div className="settings-modal">
+    <div>
+      <label>Bedrooms:</label>
+      <select value={bedrooms} onChange={e => setBedrooms(e.target.value)}>
+        {[1, 2, 3, 4, 5].map(num => (
+          <option key={num} value={num}>{num}</option>
+        ))}
+      </select>
+    </div>
+    <div>
+      <label>Housing Type:</label>
+      <select value={housingType} onChange={e => setHousingType(e.target.value)}>
+        <option value="house">House</option>
+        <option value="apartment">Apartment</option>
+      </select>
+    </div>
+    <button onClick={() => setShowSettings(false)}>Close</button>
+  </div>
+)}
+
       </div>
       <div className="details-actions">
         <div className="work-input-button">

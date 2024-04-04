@@ -58,8 +58,7 @@ body, html {
 
   .amenities-button.red {
     background-color: rgb(214, 34, 34);
-    color: white; /* Change text color to ensure readability */
-    /* Add any other styling as needed */
+    color: white;
   }
   
   .bg-overlay {
@@ -103,8 +102,8 @@ body, html {
     width:100%;
     display: flex;
     margin-bottom: 10px;
-    justify-content: center; /* This distributes space between children */
-    align-items: center; /* Align children vertically */
+    justify-content: center;
+    align-items: center;
   }
 
   .details-eircode-box {
@@ -114,27 +113,27 @@ body, html {
     border-radius: 30px;
     width: 30%;
     background-color: #4CAF50;
-    box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
-    padding: 7px; /* Add some padding inside the box */
-    overflow: hidden; /* Hides any overflowing text */
+    box-sizing: border-box;
+    padding: 7px;
+    overflow: hidden;
   }
   
   .eircode-text {
     color: #ffffff;
-    white-space: nowrap; /* Prevents text from wrapping */
-    text-overflow: ellipsis; /* Adds ellipsis to text that overflows */
-    overflow: hidden; /* Hides any overflowing text */
-    max-width: 100%; /* Ensures text does not exceed the parent container */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
   }
   
 
   .details-panel {
     position: absolute;
     top: 10%;
-    right: 10%; /* Align to the right to use only half of the screen */
-    width: 30%; /* Adjust width to use less than half of the screen for padding */
-    max-height: 80%; /* Adjust height to take up a portion of the screen */
-    overflow-y: auto; /* Add scroll inside the panel if content overflows */
+    right: 10%;
+    width: 30%;
+    max-height: 80%;
+    overflow-y: auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -156,6 +155,12 @@ body, html {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+  }
+
+  .details-header-settings {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
   }
   
   .close-button {
@@ -181,8 +186,8 @@ body, html {
   
   .buttons-container {
     display: flex;
-    align-items: center; /* This will vertically align the children */
-    justify-content: space-between; /* This will place space between the children */
+    align-items: center;
+    justify-content: space-between;
   }
   
  
@@ -217,13 +222,13 @@ body, html {
   
   .flood-button-container {
     flex: 0 1 auto;
-    flex-grow: 0; /* Do not allow the flood button to grow */
-  flex-shrink: 0; /* Prevent the button from shrinking */
+    flex-grow: 0;
+  flex-shrink: 0;
   margin-left: 10px; 
   }
 
   .grey-out {
-    background-color: grey !important; /* Override other styles */
+    background-color: grey !important;
     color: white !important;
   }  
 
@@ -241,7 +246,6 @@ body, html {
     font-size: 16px;
   }
   
-  /* Add this class to your existing CSS to show the panel */
   .show {
     opacity: 1;
     visibility: visible;
@@ -294,6 +298,60 @@ body, html {
     margin-right: 10px;
   }
 
+  .settings-modal {
+    position: absolute;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+  }
+  
+  .settings-modal label {
+    display: block;
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+    color: #333;
+    font-size: 1rem;
+  }
+  
+  .settings-modal select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .settings-modal button {
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .settings-modal button:hover {
+    background-color: #e2e6ea;
+  }
+  
+
+  .settings-icon {
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 5px;
+  }
+  
+  .settings-icon:hover {
+    color: #007bff;
+    transform: scale(1.1);
+  }
+
   .submit-button {
     font-size: 1em;
     padding: 10px;
@@ -332,8 +390,8 @@ body, html {
 
   .work-input-button,
   .flood-button-container {
-    width: 100%; /* On small screens, make them full width to stack vertically */
-    margin: 10px 0; /* Add vertical space between them */
+    width: 100%;
+    margin: 10px 0;
   }
 }
   
