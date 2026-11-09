@@ -38,7 +38,7 @@ const fetchAveragePropertyPrice = async (locationConstant, numBedrooms, property
 
 // Function to geocode Eircode
 const geocodeEircode = async (GeoEir) => {
-  const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=AmSsIUTDSvycwzlsc5E_knb_qVHrEiJ-t3zWaoxIxB_BrikqpOHi95wIGjTRIkeR`
+  const bingGeocodingUrl = `https://dev.virtualearth.net/REST/v1/Locations?countryRegion=IE&postalCode=${encodeURIComponent(GeoEir)}&key=${process.env.REACT_APP_BING_MAPS_KEY}`
   try {
     const response = await fetch(bingGeocodingUrl)
     const data = await response.json()
